@@ -21,7 +21,7 @@ strg = '%s %s %s' % (compiler, fopts, fsource)
 sys.stdout.write('executing "%s"\n' % strg)
 subprocess.call(strg,shell=True)
 
-if os.path.exists('crtm_interface.c'): os.remove('crtm_interface.c') # trigger a rebuild
+if os.path.exists('pycrtm.c'): os.remove('pycrtm.c') # trigger a rebuild
 
 # build c extension that calls fortran.
 libs = ['crtm','gfortran']
@@ -29,13 +29,13 @@ inc_dirs = [CRTM_incdir]
 inc_dirs.append(numpy.get_include())
 lib_dirs = [CRTM_libdir,'/opt/local/lib/gcc6']
 objs = ['%s.o' % fname] # fortran object to link
-ext_modules = [Extension('crtm_interface',                       # module name
-                        ['crtm_interface.pyx'],                  # cython source file
+ext_modules = [Extension('pycrtm',                       # module name
+                        ['pycrtm.pyx'],                  # cython source file
                         libraries     = libs,
                         extra_objects = objs,
                         include_dirs  = inc_dirs,
                         library_dirs  = lib_dirs)]
 
-setup(name = 'crtm_interface',
+setup(name = 'pycrtm',
       cmdclass = {'build_ext': build_ext},
       ext_modules  = ext_modules)
