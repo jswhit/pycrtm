@@ -1,0 +1,1 @@
+#define CRTM_STRLEN 20
