@@ -157,7 +157,8 @@ cdef class Channel_Info:
     def __repr__(self):
         printlist = [' ChannelInfo OBJECT:\n']
         printlist.append('   n_Channels       : %s\n' % self.n_Channels)
-        printlist.append('   Sensor_Type     : %s\n' % self.Sensor_Type)
+        printlist.append('   Sensor_ID        : %s\n' % self.Sensor_ID)
+        printlist.append('   Sensor_Type      : %s\n' % self.Sensor_Type)
         printlist.append('   WMO_Satellite_ID : %s\n' % self.WMO_Satellite_ID)
         printlist.append('   WMO_Sensor_ID    : %s\n' % self.WMO_Sensor_ID)
         printlist.append('   Sensor_Index     : %s\n' % self.Sensor_Index)
