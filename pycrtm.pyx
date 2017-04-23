@@ -33,6 +33,13 @@ cdef extern int init_geometry(int *ifov,double *longitude,double *latitude,
                 int *year,int *month,int *day, void *geometryp);
 cdef extern int geometry_set_ifov(void *geometryp, int *n);
 cdef extern int geometry_get_ifov(void *geometryp, int *n);
+cdef extern int geometry_set_year(void *geometryp, int *n);
+cdef extern int geometry_get_year(void *geometryp, int *n);
+cdef extern int geometry_set_month(void *geometryp, int *n);
+cdef extern int geometry_get_month(void *geometryp, int *n);
+cdef extern int geometry_set_day(void *geometryp, int *n);
+cdef extern int geometry_get_day(void *geometryp, int *n);
+cdef extern int destroy_geometry(void *geometryp);
 
 # header file with constants
 cdef extern from 'pycrtm_interface.h':
@@ -184,3 +191,52 @@ cdef class Geometry:
             return i
         def __set__(self,int value):
             geometry_set_ifov(&self.ptr, &value)
+    property year:
+        """get and set year member of derived type"""
+        def __get__(self):
+            cdef int i
+            geometry_get_year(&self.ptr, &i)
+            return i
+        def __set__(self,int value):
+            geometry_set_year(&self.ptr, &value)
+    property month:
+        """get and set month member of derived type"""
+        def __get__(self):
+            cdef int i
+            geometry_get_month(&self.ptr, &i)
+            return i
+        def __set__(self,int value):
+            geometry_set_month(&self.ptr, &value)
+    property day:
+        """get and set day member of derived type"""
+        def __get__(self):
+            cdef int i
+            geometry_get_day(&self.ptr, &i)
+            return i
+        def __set__(self,int value):
+            geometry_set_day(&self.ptr, &value)
+    def __repr__(self):
+        printlist = [' Geometry OBJECT:\n']
+        printlist.append('   FOV index           : %s\n' % self.ifov)
+        printlist.append('   Longitude           : %s\n' % self.longitude)   
+        printlist.append('   Latitide            : %s\n' % self.latitude)
+        printlist.append('   Surface altitude    : %s\n' %\
+                self.surface_altitude)
+        printlist.append('   Sensor scan angle   : %s\n' %\
+                self.sensor_scan_angle)
+        printlist.append('   Sensor zenith angle : %s\n' %\
+                self.sensor_zenith_angle)
+        printlist.append('   Sensor azimuth angle: %s\n' %\
+                self.sensor_azimuth_angle)
+        printlist.append('   Source zenith angle : %s\n' %\
+                self.source_zenith_angle)
+        printlist.append('   Source azimuth angle: %s\n' %\
+                self.source_azimuth_angle)
+        printlist.append('   Flux zenith angle   : %s\n' %\
+                self.flux_zenith_angle)
+        printlist.append('   Year                : %s\n' % self.year)
+        printlist.append('   Month               : %s\n' % self.month)
+        printlist.append('   Day                 : %s\n' % self.day)
+        return ''.join(printlist)
+    def __dealloc__(self):
+        destroy_geometry(&self.ptr)

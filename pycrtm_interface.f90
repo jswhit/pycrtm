@@ -4,7 +4,7 @@ use iso_c_binding, only: c_char, c_int, c_double, c_null_char, &
  c_ptr, c_loc, c_f_pointer
 use crtm_module, only: crtm_init, crtm_destroy, crtm_channelinfo_type, &
  success, strlen, crtm_channelinfo_inspect, crtm_geometry_inspect, &
- crtm_geometry_setvalue, crtm_geometry_type
+ crtm_geometry_setvalue, crtm_geometry_type, crtm_geometry_destroy
 implicit none 
 
 contains
@@ -338,6 +338,69 @@ subroutine geometry_set_ifov(geometryp, ifov) bind(c)
    call c_f_pointer(geometryp, geometry)
    geometry % ifov = ifov
 end subroutine geometry_set_ifov
+
+! get crtm_geometry_type derived type member year
+subroutine geometry_get_year(geometryp, year) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   integer(c_int), intent(out) :: year
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   year = geometry % year
+end subroutine geometry_get_year
+
+! set crtm_geometry_type derived type member year
+subroutine geometry_set_year(geometryp, year) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   integer(c_int), intent(in) :: year
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % year = year
+end subroutine geometry_set_year
+
+! get crtm_geometry_type derived type member month
+subroutine geometry_get_month(geometryp, month) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   integer(c_int), intent(out) :: month
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   month = geometry % month
+end subroutine geometry_get_month
+
+! set crtm_geometry_type derived type member month
+subroutine geometry_set_month(geometryp, month) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   integer(c_int), intent(in) :: month
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % month = month
+end subroutine geometry_set_month
+
+! get crtm_geometry_type derived type member day
+subroutine geometry_get_day(geometryp, day) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   integer(c_int), intent(out) :: day
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   day = geometry % day
+end subroutine geometry_get_day
+
+! set crtm_geometry_type derived type member day
+subroutine geometry_set_day(geometryp, day) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   integer(c_int), intent(in) :: day
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % day = day
+end subroutine geometry_set_day
+
+! deallocate crtm_geometry_type
+subroutine destroy_geometry(geometryp) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   call crtm_geometry_destroy(geometry)
+   deallocate(geometry)
+end subroutine destroy_geometry
 
 ! utility functions
 subroutine copy_string_ctof(stringc,stringf)
