@@ -10,3 +10,7 @@ print
 channel_info.show() # fortran side
 print
 print channel_info # python side
+geometry = pycrtm.Geometry()
+geometry.ifov = 10
+print geometry.ifov
+geometry.show()
