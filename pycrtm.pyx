@@ -3,31 +3,42 @@ from numpy cimport ndarray
 
 # fortran functions with iso_c_binding interfaces.
 cdef extern int get_strlen(int *strlen);
-cdef extern int init_crtm(int *nchanl, char *isis, int *iload_cloudcoeffs, int *iload_aerosolcoeffs, char *crtm_coeffs_path, int *ichannel_info);
-cdef extern int destroy_channelinfo(int *ichannel_info);
-cdef extern int print_channelinfo(int *ichannel_info);
-cdef extern int channelinfo_set_n_channels(int *ichannel_info, int *n);
-cdef extern int channelinfo_get_n_channels(int *ichannel_info, int *n);
-cdef extern int channelinfo_set_sensor_index(int *ichannel_info, int *n);
-cdef extern int channelinfo_get_sensor_index(int *ichannel_info, int *n);
-cdef extern int channelinfo_set_sensor_type(int *ichannel_info, int *n);
-cdef extern int channelinfo_get_sensor_type(int *ichannel_info, int *n);
-cdef extern int channelinfo_set_wmo_satellite_id(int *ichannel_info, int *n);
-cdef extern int channelinfo_get_wmo_satellite_id(int *ichannel_info, int *n);
-cdef extern int channelinfo_set_wmo_sensor_id(int *ichannel_info, int *n);
-cdef extern int channelinfo_get_wmo_sensor_id(int *ichannel_info, int *n);
-cdef extern int channelinfo_get_sensor_id(int *ih, char *name);
-cdef extern int channelinfo_set_sensor_id(int *ih, char *name);
-cdef extern int channelinfo_get_sensor_channel(int *ichannel_info, int *value, int *nchanl);
-cdef extern int channelinfo_set_sensor_channel(int *icahnnel_info, int *value, int *nchanl);
-cdef extern int channelinfo_get_channel_index(int *ichannel_info, int *value, int *nchanl);
-cdef extern int channelinfo_set_channel_index(int *icahnnel_info, int *value, int *nchanl);
-cdef extern int channelinfo_get_process_channel(int *ichannel_info, int *value, int *nchanl);
-cdef extern int channelinfo_set_process_channel(int *icahnnel_info, int *value, int *nchanl);
+cdef extern int init_crtm(int *nchanl, char *isis, int *iload_cloudcoeffs, int *iload_aerosolcoeffs, char *crtm_coeffs_path, void *channelinfop);
+cdef extern int destroy_channelinfo(void *channelinfop);
+cdef extern int print_channelinfo(void *channelinfop);
+cdef extern int channelinfo_set_n_channels(void *channelinfop, int *n);
+cdef extern int channelinfo_get_n_channels(void *channelinfop, int *n);
+cdef extern int channelinfo_set_sensor_index(void *channelinfop, int *n);
+cdef extern int channelinfo_get_sensor_index(void *channelinfop, int *n);
+cdef extern int channelinfo_set_sensor_type(void *channelinfop, int *n);
+cdef extern int channelinfo_get_sensor_type(void *channelinfop, int *n);
+cdef extern int channelinfo_set_wmo_satellite_id(void *channelinfop, int *n);
+cdef extern int channelinfo_get_wmo_satellite_id(void *channelinfop, int *n);
+cdef extern int channelinfo_set_wmo_sensor_id(void *channelinfop, int *n);
+cdef extern int channelinfo_get_wmo_sensor_id(void *channelinfop, int *n);
+cdef extern int channelinfo_get_sensor_id(void *channelinfop, char *name);
+cdef extern int channelinfo_set_sensor_id(void *channelinfop, char *name);
+cdef extern int channelinfo_get_sensor_channel(void *channelinfop, int *value, int *nchanl);
+cdef extern int channelinfo_set_sensor_channel(void *channelinfop, int *value, int *nchanl);
+cdef extern int channelinfo_get_channel_index(void *channelinfop, int *value, int *nchanl);
+cdef extern int channelinfo_set_channel_index(void *channelinfop, int *value, int *nchanl);
+cdef extern int channelinfo_get_process_channel(void *channelinfop, int *value, int *nchanl);
+cdef extern int channelinfo_set_process_channel(void *channelinfop, int *value, int *nchanl);
+cdef extern int print_geometry(void *geometryp);
+cdef extern int init_geometry(int *ifov,double *longitude,double *latitude,
+                double* surface_altitude,double *sensor_scan_angle,
+                double *sensor_zenith_angle,double *sensor_azimuth_angle,
+                double *source_zenith_angle,double *source_aziumth_angle,
+                double *flux_zenith_angle,
+                int *year,int *month,int *day, void *geometryp);
+cdef extern int geometry_set_ifov(void *geometryp, int *n);
+cdef extern int geometry_get_ifov(void *geometryp, int *n);
 
 # header file with constants
 cdef extern from 'pycrtm_interface.h':
    enum: CRTM_STRLEN
+
+cdef double DIFFUSIVITY_ANGLE  = 53.130102354156 # from CRTM_Parameters.f90
 
 #  When interfacing between Fortran and C, you will have to pass pointers to all
 #  the variables you send to the Fortran function as arguments. Passing a variable
@@ -45,98 +56,97 @@ if _crtm_strlen != CRTM_STRLEN:
 
 # python version of Channel_Info fortran derived type
 cdef class Channel_Info:
-    cdef ndarray ptr
+    cdef void *ptr
     cdef int nchanl
     def __init__(self, int nchanl, char *isis, int iload_cloudcoeff, int iload_aerosolcoeff, char *crtm_coeffs_path):
-        cdef ndarray ichannel_info = np.empty(12, np.intc)
         self.nchanl = nchanl
-        init_crtm(&nchanl, isis, &iload_cloudcoeff, &iload_aerosolcoeff, crtm_coeffs_path, <int *>ichannel_info.data)
-        self.ptr = ichannel_info
+        init_crtm(&nchanl, isis, &iload_cloudcoeff, &iload_aerosolcoeff,
+                crtm_coeffs_path, &self.ptr)
     def show(self):
-        print_channelinfo(<int *>self.ptr.data)
+        print_channelinfo(&self.ptr)
     property n_Channels:
         """get and set n_Channels member of derived type"""
         def __get__(self):
             cdef int i
-            channelinfo_get_n_channels(<int *>self.ptr.data, &i)
+            channelinfo_get_n_channels(&self.ptr, &i)
             return i
         def __set__(self,int value):
-            channelinfo_set_n_channels(<int *>self.ptr.data, &value)
+            channelinfo_set_n_channels(&self.ptr, &value)
     property Sensor_Type:
         """get and set Sensor_Type member of derived type"""
         def __get__(self):
             cdef int i
-            channelinfo_get_sensor_type(<int *>self.ptr.data, &i)
+            channelinfo_get_sensor_type(&self.ptr, &i)
             return i
         def __set__(self,int value):
-            channelinfo_set_sensor_type(<int *>self.ptr.data, &value)
+            channelinfo_set_sensor_type(&self.ptr, &value)
     property WMO_Satellite_ID:
         """get and set WMO_Satellite_ID member of derived type"""
         def __get__(self):
             cdef int i
-            channelinfo_get_wmo_satellite_id(<int *>self.ptr.data, &i)
+            channelinfo_get_wmo_satellite_id(&self.ptr, &i)
             return i
         def __set__(self,int value):
-            channelinfo_set_wmo_satellite_id(<int *>self.ptr.data, &value)
+            channelinfo_set_wmo_satellite_id(&self.ptr, &value)
     property WMO_Sensor_ID:
         """get and set WMO_Sensor_ID member of derived type"""
         def __get__(self):
             cdef int i
-            channelinfo_get_wmo_sensor_id(<int *>self.ptr.data, &i)
+            channelinfo_get_wmo_sensor_id(&self.ptr, &i)
             return i
         def __set__(self,int value):
-            channelinfo_set_wmo_sensor_id(<int *>self.ptr.data, &value)
+            channelinfo_set_wmo_sensor_id(&self.ptr, &value)
     property Sensor_ID:
         """get and set Sensor_ID member of derived type"""
         def __get__(self):
             cdef char name[CRTM_STRLEN+1] # null char will be added
-            channelinfo_get_sensor_id(<int *>self.ptr.data, name)
+            channelinfo_get_sensor_id(&self.ptr, name)
             return name
         def __set__(self,char *value):
-            channelinfo_set_sensor_id(<int *>self.ptr.data, value)
+            channelinfo_set_sensor_id(&self.ptr, value)
     property Sensor_Index:
         """get and set Sensor_Index member of derived type"""
         def __get__(self):
             cdef int i
-            channelinfo_get_sensor_index(<int *>self.ptr.data, &i)
+            channelinfo_get_sensor_index(&self.ptr, &i)
             return i
         def __set__(self,int value):
-            channelinfo_set_sensor_index(<int *>self.ptr.data, &value)
+            channelinfo_set_sensor_index(&self.ptr, &value)
     property Sensor_Channel:
         """get and set Sensor_Channel member of derived type"""
         def __get__(self):
             cdef ndarray iarr = np.empty(self.nchanl,np.intc)
-            channelinfo_get_sensor_channel(<int *>self.ptr.data, <int *>iarr.data, &self.nchanl)
+            channelinfo_get_sensor_channel(&self.ptr, <int *>iarr.data, &self.nchanl)
             return iarr
         def __set__(self,ndarray value):
             value = value.astype(np.intc)
             if value.size != self.nchanl:
                 raise ValueError('cannot change the size of Sensor_Channel member')
-            channelinfo_set_sensor_channel(<int *>self.ptr.data, <int *>value.data, &self.nchanl)
+            channelinfo_set_sensor_channel(&self.ptr, <int *>value.data, &self.nchanl)
     property Process_Channel:
         """get and set Process_Channel member of derived type"""
         def __get__(self):
             cdef ndarray iarr = np.empty(self.nchanl,np.intc)
-            channelinfo_get_process_channel(<int *>self.ptr.data, <int *>iarr.data, &self.nchanl)
+            channelinfo_get_process_channel(&self.ptr, <int *>iarr.data, &self.nchanl)
             return iarr.astype(np.bool)
         def __set__(self,ndarray value):
             value = value.astype(np.intc)
             if value.size != self.nchanl:
                 raise ValueError('cannot change the size of Process_Channel member')
-            channelinfo_set_process_channel(<int *>self.ptr.data, <int *>value.data, &self.nchanl)
+            channelinfo_set_process_channel(&self.ptr, <int *>value.data, &self.nchanl)
     property Channel_Index:
         """get and set Channel_Index member of derived type"""
         def __get__(self):
             cdef ndarray iarr = np.empty(self.nchanl,np.intc)
-            channelinfo_get_channel_index(<int *>self.ptr.data, <int *>iarr.data, &self.nchanl)
+            channelinfo_get_channel_index(&self.ptr, <int *>iarr.data, &self.nchanl)
             return iarr
         def __set__(self,ndarray value):
             value = value.astype(np.intc)
             if value.size != self.nchanl:
                 raise ValueError('cannot change the size of Channel_Index member')
-            channelinfo_set_channel_index(<int *>self.ptr.data, <int *>value.data, &self.nchanl)
+            channelinfo_set_channel_index(&self.ptr, <int *>value.data, &self.nchanl)
     def __dealloc__(self):
-        destroy_channelinfo(<int *>self.ptr.data)
+        destroy_channelinfo(&self.ptr)
     def __repr__(self):
         printlist = [' ChannelInfo OBJECT:\n']
         printlist.append('   n_Channels       : %s\n' % self.n_Channels)
@@ -149,4 +159,28 @@ cdef class Channel_Info:
             printlist.append('        %s           %s        %s\n' % (self.Sensor_Channel[n],\
             self.Channel_Index[n],self.Process_Channel[n]))
         return ''.join(printlist)
-        
+
+cdef class Geometry:
+    cdef void *ptr
+    def __init__(self, int ifov=0, double longitude=0, double latitude=0,
+                 double surface_altitude=0, double sensor_scan_angle=0,
+                 double sensor_zenith_angle=0,
+                 double sensor_azimuth_angle=999.9,
+                 double source_zenith_angle=100, double source_aziumth_angle=0,
+                 double flux_zenith_angle=DIFFUSIVITY_ANGLE, int year=2001,
+                 int month=1, int day=1):
+        init_geometry(&ifov,&longitude,&latitude,
+                &surface_altitude,&sensor_scan_angle,
+                &sensor_zenith_angle,&sensor_azimuth_angle,
+                &source_zenith_angle,&source_aziumth_angle,&flux_zenith_angle,
+                &year,&month,&day,&self.ptr)
+    def show(self):
+        print_geometry(&self.ptr)
+    property ifov:
+        """get and set ifov member of derived type"""
+        def __get__(self):
+            cdef int i
+            geometry_get_ifov(&self.ptr, &i)
+            return i
+        def __set__(self,int value):
+            geometry_set_ifov(&self.ptr, &value)
