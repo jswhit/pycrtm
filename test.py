@@ -12,5 +12,9 @@ print
 print channel_info # python side
 geometry = pycrtm.Geometry()
 geometry.ifov = 10
-print geometry.ifov
+geometry.year = 1993
+geometry.month = 11
+geometry.day = 21
+geometry.latitude = -3.1415
 geometry.show()
+print geometry

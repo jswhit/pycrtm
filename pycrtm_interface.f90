@@ -393,6 +393,24 @@ subroutine geometry_set_day(geometryp, day) bind(c)
    geometry % day = day
 end subroutine geometry_set_day
 
+! get crtm_geometry_type derived type member latitude
+subroutine geometry_get_latitude(geometryp, latitude) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: latitude
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   latitude = geometry % latitude
+end subroutine geometry_get_latitude
+
+! set crtm_geometry_type derived type member latitude
+subroutine geometry_set_latitude(geometryp, latitude) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: latitude
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % latitude = latitude
+end subroutine geometry_set_latitude
+
 ! deallocate crtm_geometry_type
 subroutine destroy_geometry(geometryp) bind(c)
    type(c_ptr), intent(in) :: geometryp
@@ -401,6 +419,150 @@ subroutine destroy_geometry(geometryp) bind(c)
    call crtm_geometry_destroy(geometry)
    deallocate(geometry)
 end subroutine destroy_geometry
+
+! get crtm_geometry_type derived type member longitude
+subroutine geometry_get_longitude(geometryp, longitude) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: longitude
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   longitude = geometry % longitude
+end subroutine geometry_get_longitude
+
+! set crtm_geometry_type derived type member longitude
+subroutine geometry_set_longitude(geometryp, longitude) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: longitude
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % longitude = longitude
+end subroutine geometry_set_longitude
+
+! get crtm_geometry_type derived type member surface_altitude
+subroutine geometry_get_surface_altitude(geometryp, surface_altitude) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: surface_altitude
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   surface_altitude = geometry % surface_altitude
+end subroutine geometry_get_surface_altitude
+
+! set crtm_geometry_type derived type member surface_altitude
+subroutine geometry_set_surface_altitude(geometryp, surface_altitude) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: surface_altitude
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % surface_altitude = surface_altitude
+end subroutine geometry_set_surface_altitude
+
+! get crtm_geometry_type derived type member sensor_scan_angle
+subroutine geometry_get_sensor_scan_angle(geometryp, sensor_scan_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: sensor_scan_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   sensor_scan_angle = geometry % sensor_scan_angle
+end subroutine geometry_get_sensor_scan_angle
+
+! set crtm_geometry_type derived type member sensor_scan_angle
+subroutine geometry_set_sensor_scan_angle(geometryp, sensor_scan_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: sensor_scan_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % sensor_scan_angle = sensor_scan_angle
+end subroutine geometry_set_sensor_scan_angle
+
+! get crtm_geometry_type derived type member sensor_zenith_angle
+subroutine geometry_get_sensor_zenith_angle(geometryp, sensor_zenith_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: sensor_zenith_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   sensor_zenith_angle = geometry % sensor_zenith_angle
+end subroutine geometry_get_sensor_zenith_angle
+
+! set crtm_geometry_type derived type member sensor_zenith_angle
+subroutine geometry_set_sensor_zenith_angle(geometryp, sensor_zenith_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: sensor_zenith_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % sensor_zenith_angle = sensor_zenith_angle
+end subroutine geometry_set_sensor_zenith_angle
+
+! get crtm_geometry_type derived type member sensor_azimuth_angle
+subroutine geometry_get_sensor_azimuth_angle(geometryp, sensor_azimuth_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: sensor_azimuth_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   sensor_azimuth_angle = geometry % sensor_azimuth_angle
+end subroutine geometry_get_sensor_azimuth_angle
+
+! set crtm_geometry_type derived type member sensor_azimuth_angle
+subroutine geometry_set_sensor_azimuth_angle(geometryp, sensor_azimuth_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: sensor_azimuth_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % sensor_azimuth_angle = sensor_azimuth_angle
+end subroutine geometry_set_sensor_azimuth_angle
+
+! get crtm_geometry_type derived type member source_zenith_angle
+subroutine geometry_get_source_zenith_angle(geometryp, source_zenith_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: source_zenith_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   source_zenith_angle = geometry % source_zenith_angle
+end subroutine geometry_get_source_zenith_angle
+
+! set crtm_geometry_type derived type member source_zenith_angle
+subroutine geometry_set_source_zenith_angle(geometryp, source_zenith_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: source_zenith_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % source_zenith_angle = source_zenith_angle
+end subroutine geometry_set_source_zenith_angle
+
+! get crtm_geometry_type derived type member source_azimuth_angle
+subroutine geometry_get_source_azimuth_angle(geometryp, source_azimuth_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: source_azimuth_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   source_azimuth_angle = geometry % source_azimuth_angle
+end subroutine geometry_get_source_azimuth_angle
+
+! set crtm_geometry_type derived type member source_azimuth_angle
+subroutine geometry_set_source_azimuth_angle(geometryp, source_azimuth_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: source_azimuth_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % source_azimuth_angle = source_azimuth_angle
+end subroutine geometry_set_source_azimuth_angle
+
+! get crtm_geometry_type derived type member flux_zenith_angle
+subroutine geometry_get_flux_zenith_angle(geometryp, flux_zenith_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(out) :: flux_zenith_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   flux_zenith_angle = geometry % flux_zenith_angle
+end subroutine geometry_get_flux_zenith_angle
+
+! set crtm_geometry_type derived type member flux_zenith_angle
+subroutine geometry_set_flux_zenith_angle(geometryp, flux_zenith_angle) bind(c)
+   type(c_ptr), intent(in) :: geometryp
+   real(c_double), intent(in) :: flux_zenith_angle
+   type (crtm_geometry_type), pointer :: geometry
+   call c_f_pointer(geometryp, geometry)
+   geometry % flux_zenith_angle = flux_zenith_angle
+end subroutine geometry_set_flux_zenith_angle
 
 ! utility functions
 subroutine copy_string_ctof(stringc,stringf)

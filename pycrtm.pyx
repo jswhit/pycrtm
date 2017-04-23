@@ -39,6 +39,24 @@ cdef extern int geometry_set_month(void *geometryp, int *n);
 cdef extern int geometry_get_month(void *geometryp, int *n);
 cdef extern int geometry_set_day(void *geometryp, int *n);
 cdef extern int geometry_get_day(void *geometryp, int *n);
+cdef extern int geometry_set_latitude(void *geometryp, double *x);
+cdef extern int geometry_get_latitude(void *geometryp, double *x);
+cdef extern int geometry_set_longitude(void *geometryp, double *x);
+cdef extern int geometry_get_longitude(void *geometryp, double *x);
+cdef extern int geometry_set_surface_altitude(void *geometryp, double *x);
+cdef extern int geometry_get_surface_altitude(void *geometryp, double *x);
+cdef extern int geometry_set_sensor_scan_angle(void *geometryp, double *x);
+cdef extern int geometry_get_sensor_scan_angle(void *geometryp, double *x);
+cdef extern int geometry_set_sensor_zenith_angle(void *geometryp, double *x);
+cdef extern int geometry_get_sensor_zenith_angle(void *geometryp, double *x);
+cdef extern int geometry_set_sensor_azimuth_angle(void *geometryp, double *x);
+cdef extern int geometry_get_sensor_azimuth_angle(void *geometryp, double *x);
+cdef extern int geometry_set_source_zenith_angle(void *geometryp, double *x);
+cdef extern int geometry_get_source_zenith_angle(void *geometryp, double *x);
+cdef extern int geometry_set_source_azimuth_angle(void *geometryp, double *x);
+cdef extern int geometry_get_source_azimuth_angle(void *geometryp, double *x);
+cdef extern int geometry_set_flux_zenith_angle(void *geometryp, double *x);
+cdef extern int geometry_get_flux_zenith_angle(void *geometryp, double *x);
 cdef extern int destroy_geometry(void *geometryp);
 
 # header file with constants
@@ -216,10 +234,82 @@ cdef class Geometry:
             return i
         def __set__(self,int value):
             geometry_set_day(&self.ptr, &value)
+    property latitude:
+        """get and set latitude member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_latitude(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_latitude(&self.ptr, &value)
+    property longitude:
+        """get and set longitude member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_longitude(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_longitude(&self.ptr, &value)
+    property surface_altitude:
+        """get and set surface_altitude member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_surface_altitude(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_surface_altitude(&self.ptr, &value)
+    property sensor_scan_angle:
+        """get and set sensor_scan_angle member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_sensor_scan_angle(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_sensor_scan_angle(&self.ptr, &value)
+    property sensor_zenith_angle:
+        """get and set sensor_zenith_angle member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_sensor_zenith_angle(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_sensor_zenith_angle(&self.ptr, &value)
+    property sensor_azimuth_angle:
+        """get and set sensor_azimuth_angle member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_sensor_azimuth_angle(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_sensor_azimuth_angle(&self.ptr, &value)
+    property source_zenith_angle:
+        """get and set source_zenith_angle member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_source_zenith_angle(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_source_zenith_angle(&self.ptr, &value)
+    property source_azimuth_angle:
+        """get and set source_azimuth_angle member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_source_azimuth_angle(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_source_azimuth_angle(&self.ptr, &value)
+    property flux_zenith_angle:
+        """get and set flux_zenith_angle member of derived type"""
+        def __get__(self):
+            cdef double x
+            geometry_get_flux_zenith_angle(&self.ptr, &x)
+            return x
+        def __set__(self,double value):
+            geometry_set_flux_zenith_angle(&self.ptr, &value)
     def __repr__(self):
         printlist = [' Geometry OBJECT:\n']
         printlist.append('   FOV index           : %s\n' % self.ifov)
-        printlist.append('   Longitude           : %s\n' % self.longitude)   
+        printlist.append('   Longitude           : %s\n' % self.longitude)
         printlist.append('   Latitide            : %s\n' % self.latitude)
         printlist.append('   Surface altitude    : %s\n' %\
                 self.surface_altitude)
