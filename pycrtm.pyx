@@ -310,7 +310,7 @@ cdef class Geometry:
         printlist = [' Geometry OBJECT:\n']
         printlist.append('   FOV index           : %s\n' % self.ifov)
         printlist.append('   Longitude           : %s\n' % self.longitude)
-        printlist.append('   Latitide            : %s\n' % self.latitude)
+        printlist.append('   Latitude            : %s\n' % self.latitude)
         printlist.append('   Surface altitude    : %s\n' %\
                 self.surface_altitude)
         printlist.append('   Sensor scan angle   : %s\n' %\
