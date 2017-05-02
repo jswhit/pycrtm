@@ -332,3 +332,14 @@ cdef class Geometry:
         return ''.join(printlist)
     def __dealloc__(self):
         destroy_geometry(&self.ptr)
+
+# TODO:
+# crtm_surface_type
+# crtm_atmosphere_type
+# crtm_rtsolution_type
+# crtm_options_type
+# crtm_cloud_type ? (part of crtm_atmosphere_type)
+# crtm_aerosol_type ? (part of crtm_atmosphere_type)
+# crtm_SensorData_type ? (part of crtm_surface_type)
+# ssu_input_type? (part of crtm_options_type)
+# zeeman_input_type? (part of crtm_options_type)
