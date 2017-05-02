@@ -80,7 +80,7 @@ if _crtm_strlen != CRTM_STRLEN:
     raise ValueError('inconsistent value of CRTM_STRLEN')
 
 # python version of crtm_channelinfo_type fortran derived type
-cdef class Channel_Info:
+cdef class ChannelInfo:
     cdef void *ptr
     cdef int nchanl
     def __init__(self, int nchanl, char *isis, int iload_cloudcoeff, int iload_aerosolcoeff, char *crtm_coeffs_path):
