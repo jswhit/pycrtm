@@ -79,7 +79,7 @@ _crtm_strlen = crtm_strlen()
 if _crtm_strlen != CRTM_STRLEN:
     raise ValueError('inconsistent value of CRTM_STRLEN')
 
-# python version of Channel_Info fortran derived type
+# python version of crtm_channelinfo_type fortran derived type
 cdef class Channel_Info:
     cdef void *ptr
     cdef int nchanl
@@ -186,6 +186,7 @@ cdef class Channel_Info:
             self.Channel_Index[n],self.Process_Channel[n]))
         return ''.join(printlist)
 
+# python version of crtm_geometry_type fortran derived type
 cdef class Geometry:
     cdef void *ptr
     def __init__(self, int ifov=0, double longitude=0, double latitude=0,

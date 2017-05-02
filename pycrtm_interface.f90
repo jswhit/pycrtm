@@ -292,7 +292,7 @@ subroutine destroy_channelinfo(channel_infop) bind(c)
    deallocate(channel_info)
 end subroutine destroy_channelinfo
 
-! initialize Geometry_Info type
+! initialize Geometry type
 subroutine init_geometry(ifov,longitude,latitude,&
                 surface_altitude,sensor_scan_angle,&
                 sensor_zenith_angle,sensor_azimuth_angle,&
