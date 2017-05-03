@@ -58,12 +58,22 @@ cdef extern int geometry_get_source_azimuth_angle(void *geometryp, double *x);
 cdef extern int geometry_set_flux_zenith_angle(void *geometryp, double *x);
 cdef extern int geometry_get_flux_zenith_angle(void *geometryp, double *x);
 cdef extern int destroy_geometry(void *geometryp);
+cdef extern int init_options(long *n_Channels,int *check_input,
+                int *Use_Old_MWSSEM,int *Use_Antenna_Correction,
+                int *Apply_NLTE_Correction,long *RT_Algorithm_Id,
+                double *Aircraft_Pressure,int *Use_n_Streams,
+                long *n_Streams,int *Include_Scattering,
+                long *Channel,int *Use_Emissivity, void *optionsp);
+cdef extern int destroy_options(void *optionsp);
 
 # header file with constants
 cdef extern from 'pycrtm_interface.h':
    enum: CRTM_STRLEN
 
-cdef double DIFFUSIVITY_ANGLE  = 53.130102354156 # from CRTM_Parameters.f90
+# from CRTM_Parameters.f90 (used for default initialization of CRTM types)
+cdef double DIFFUSIVITY_ANGLE  = 53.130102354156 
+cdef int RT_ADA = 56
+cdef int RT_SOI = 168
 
 #  When interfacing between Fortran and C, you will have to pass pointers to all
 #  the variables you send to the Fortran function as arguments. Passing a variable
@@ -332,6 +342,68 @@ cdef class Geometry:
         return ''.join(printlist)
     def __dealloc__(self):
         destroy_geometry(&self.ptr)
+
+# python version of crtm_options_type fortran derived type
+# TYPE :: CRTM_Options_type
+#   ! Input checking on by default
+#   LOGICAL :: Check_Input = .TRUE.
+#   ! User defined MW water emissivity algorithm
+#   LOGICAL :: Use_Old_MWSSEM = .FALSE.
+#   ! Antenna correction application
+#   LOGICAL :: Use_Antenna_Correction = .FALSE.
+#   ! NLTE radiance correction is ON by default
+#   LOGICAL :: Apply_NLTE_Correction = .TRUE.
+#   ! RT Algorithm is set to ADA by default
+#   INTEGER(Long) :: RT_Algorithm_Id = RT_ADA
+#   ! Aircraft flight level pressure
+#   ! Value > 0 turns "on" the aircraft option
+#   REAL(Double) :: Aircraft_Pressure = -ONE
+#   ! User defined number of RT solver streams (streams up + streams down)
+#   LOGICAL       :: Use_n_Streams = .FALSE.
+#   INTEGER(Long) :: n_Streams = 0
+#   ! Scattering switch. Default is for
+#   ! Cloud/Aerosol scattering to be included.
+#   LOGICAL :: Include_Scattering = .TRUE.
+#   ! User defined emissivity/reflectivity
+#   ! ...Dimensions
+#   INTEGER(Long) :: n_Channels = 0  ! L dimension
+#   ! ...Index into channel-specific components
+#   INTEGER(Long) :: Channel = 0
+#   ! ...Emissivity optional arguments
+#   LOGICAL :: Use_Emissivity = .FALSE.
+#   REAL(Double), ALLOCATABLE :: Emissivity(:)  ! L
+#   ! ...Direct reflectivity optional arguments
+#   LOGICAL :: Use_Direct_Reflectivity = .FALSE.
+#   REAL(Double), ALLOCATABLE :: Direct_Reflectivity(:) ! L
+#   ! SSU instrument input
+#   TYPE(SSU_Input_type) :: SSU
+#   ! Zeeman-splitting input
+#   TYPE(Zeeman_Input_type) :: Zeeman
+# END TYPE CRTM_Options_type
+cdef class Options:
+    cdef void *ptr
+    def __init__(self,long n_Channels,check_input=True,Use_Old_MWSSEM=False,
+             Use_Antenna_Correction=False,Apply_NLTE_Correction=True,
+             long RT_Algorithm_Id=RT_ADA,double Aircraft_Pressure=-1,Use_n_Streams=False,
+             long n_Streams=0,Include_Scattering=True,long Channel=0,Use_Emissivity=False):
+        cdef int icheck_input,iUse_Old_MWSSEM,iUse_Antenna_Correction,\
+                 iUse_n_Streams,iInclude_Scattering,iUse_Emissivity,iApply_NLTE_Correction
+        # cast python bools to ints
+        icheck_input = check_input
+        iUse_Old_MWSSEM = Use_Old_MWSSEM
+        iUse_Antenna_Correction = Use_Antenna_Correction
+        iApply_NLTE_Correction = Apply_NLTE_Correction
+        iUse_n_Streams = Use_n_Streams
+        iInclude_Scattering = Include_Scattering
+        iUse_Emissivity = Use_Emissivity
+        init_options(&n_Channels,&icheck_input,
+                &iUse_Old_MWSSEM,&iUse_Antenna_Correction,
+                &iApply_NLTE_Correction,&RT_Algorithm_Id,
+                &Aircraft_Pressure,&iUse_n_Streams,
+                &n_Streams,&iInclude_Scattering,
+                &Channel,&iUse_Emissivity, &self.ptr)
+    def __dealloc__(self):
+        destroy_options(&self.ptr)
 
 # TODO:
 # crtm_surface_type

@@ -1,10 +1,11 @@
 module pycrtm_interface
 
 use iso_c_binding, only: c_char, c_int, c_double, c_null_char, &
- c_ptr, c_loc, c_f_pointer
+ c_long, c_ptr, c_loc, c_f_pointer
 use crtm_module, only: crtm_init, crtm_destroy, crtm_channelinfo_type, &
  success, strlen, crtm_channelinfo_inspect, crtm_geometry_inspect, &
- crtm_geometry_setvalue, crtm_geometry_type, crtm_geometry_destroy
+ crtm_geometry_setvalue, crtm_geometry_type, crtm_geometry_destroy, &
+ crtm_options_type
 implicit none 
 
 contains
@@ -15,7 +16,7 @@ subroutine get_strlen(lenstr) bind(c)
   lenstr = strlen
 end subroutine get_strlen
 
-! initialize Channel_Info type, read in coefficient files for a given instrument/sensor
+! initialize crtm_channelinfo_type, read in coefficient files for a given instrument/sensor
 subroutine init_crtm(nchanl,isis,iload_cloudcoeff,iload_aerosolcoeff,&
                      crtm_coeffs_path,channel_infop) bind(c)
 !   input argument list:
@@ -41,8 +42,9 @@ subroutine init_crtm(nchanl,isis,iload_cloudcoeff,iload_aerosolcoeff,&
 ! local parameters
   character(len=*), parameter :: myname_='pycrtm_interface*init_crtm'
 
-  Load_CloudCoeff=iload_cloudcoeff
-  Load_AerosolCoeff=iload_aerosolcoeff
+  ! convert integer to logical
+  Load_CloudCoeff=iload_cloudcoeff /= 0
+  Load_AerosolCoeff=iload_aerosolcoeff /= 0
   call copy_string_ctof(isis,isis_f)
   call copy_string_ctof(crtm_coeffs_path,crtm_coeffs_path_f)
   allocate(channel_info)
@@ -262,7 +264,7 @@ subroutine channelinfo_set_process_channel(channel_infop, process_channel, n) bi
    integer(c_int), intent(in), dimension(n) :: process_channel
    type (crtm_channelinfo_type), pointer :: channel_info
    call c_f_pointer(channel_infop, channel_info)
-   channel_info % Process_Channel = process_channel
+   channel_info % Process_Channel = process_channel /= 0
 end subroutine channelinfo_set_process_channel
 
 ! get crtm_channel_info derived type member Process_Channel
@@ -271,8 +273,15 @@ subroutine channelinfo_get_process_channel(channel_infop,process_channel, n) bin
    type(c_ptr), intent(in) :: channel_infop
    integer(c_int), intent(out), dimension(n) :: process_channel
    type (crtm_channelinfo_type), pointer :: channel_info
+   integer i
    call c_f_pointer(channel_infop, channel_info)
-   process_channel = channel_info % Process_Channel
+   do i=1,n
+      if (channel_info % Process_Channel(i)) then
+          process_channel(i) = 1
+      else     
+          process_channel(i) = 0
+      endif
+   enddo
 end subroutine channelinfo_get_process_channel
 
 ! deallocate crtm_channelinfo_type
@@ -292,7 +301,7 @@ subroutine destroy_channelinfo(channel_infop) bind(c)
    deallocate(channel_info)
 end subroutine destroy_channelinfo
 
-! initialize Geometry type
+! initialize crtm_geometry_type
 subroutine init_geometry(ifov,longitude,latitude,&
                 surface_altitude,sensor_scan_angle,&
                 sensor_zenith_angle,sensor_azimuth_angle,&
@@ -563,6 +572,42 @@ subroutine geometry_set_flux_zenith_angle(geometryp, flux_zenith_angle) bind(c)
    call c_f_pointer(geometryp, geometry)
    geometry % flux_zenith_angle = flux_zenith_angle
 end subroutine geometry_set_flux_zenith_angle
+
+! initialize crtm_options_type
+subroutine init_options(n_Channels,icheck_input, &
+                iUse_Old_MWSSEM,iUse_Antenna_Correction, &
+                iApply_NLTE_Correction,RT_Algorithm_Id, &
+                Aircraft_Pressure,iUse_n_Streams, &
+                n_Streams,iInclude_Scattering, &
+                Channel,iUse_Emissivity,optionsp) bind(c)
+   integer(c_long), intent(in) :: n_Channels,RT_Algorithm_Id,n_Streams,Channel
+   integer(c_int), intent(in) :: icheck_input,iUse_Old_MWSSEM, &
+      iUse_Antenna_Correction,iApply_NLTE_Correction,iInclude_Scattering, &
+      iUse_n_Streams,iUse_Emissivity
+   real(c_double), intent(in) :: Aircraft_Pressure
+   type(c_ptr), intent(out) :: optionsp
+   logical :: check_input,Use_Old_MWSSEM, &
+      Use_Antenna_Correction,Apply_NLTE_Correction,Include_Scattering, &
+      Use_Emissivity
+   type (crtm_options_type), pointer :: options
+   allocate(options)
+   ! cast ints to fortran logicals
+   check_input = icheck_input /= 0
+   Use_Old_MWSSEM = iUse_Old_MWSSEM /= 0
+   Use_Antenna_Correction = iUse_Antenna_Correction /= 0
+   Apply_NLTE_Correction = iApply_NLTE_Correction /= 0
+   Include_Scattering = iInclude_Scattering /= 0
+   Use_Emissivity = iUse_Emissivity /= 0
+end subroutine init_options
+
+! deallocate crtm_options_type
+subroutine destroy_options(optionsp) bind(c)
+   type(c_ptr), intent(in) :: optionsp
+   type (crtm_options_type), pointer :: options
+   call c_f_pointer(optionsp, options)
+   !call crtm_options_destroy(options)
+   deallocate(options)
+end subroutine destroy_options
 
 ! utility functions
 subroutine copy_string_ctof(stringc,stringf)
