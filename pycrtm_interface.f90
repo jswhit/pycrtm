@@ -5,7 +5,7 @@ use iso_c_binding, only: c_char, c_int, c_double, c_null_char, &
 use crtm_module, only: crtm_init, crtm_destroy, crtm_channelinfo_type, &
  success, strlen, crtm_channelinfo_inspect, crtm_geometry_inspect, &
  crtm_geometry_setvalue, crtm_geometry_type, crtm_geometry_destroy, &
- crtm_options_type
+ crtm_options_type,crtm_options_create,crtm_options_inspect
 implicit none 
 
 contains
@@ -598,7 +598,27 @@ subroutine init_options(n_Channels,icheck_input, &
    Apply_NLTE_Correction = iApply_NLTE_Correction /= 0
    Include_Scattering = iInclude_Scattering /= 0
    Use_Emissivity = iUse_Emissivity /= 0
+   call crtm_options_create(options,int(n_Channels))
+   options%check_input = check_input
+   options%Use_Old_MWSSEM = Use_Old_MWSSEM
+   options%Use_Antenna_Correction = Use_Antenna_Correction
+   options%Apply_NLTE_Correction = Apply_NLTE_Correction
+   options%Include_Scattering = Include_Scattering
+   options%Use_Emissivity = Use_Emissivity
+   options%RT_Algorithm_Id = RT_Algorithm_Id
+   options%n_Streams = n_Streams
+   options%Channel = Channel
+   options%Aircraft_Pressure = Aircraft_Pressure
+   optionsp = c_loc(options)
 end subroutine init_options
+
+! print info in Options type
+subroutine print_options(optionsp) bind(c)
+  type(c_ptr), intent(in) :: optionsp
+  type (crtm_options_type), pointer :: options
+  call c_f_pointer(optionsp, options)
+  call crtm_options_inspect( options )
+end subroutine print_options
 
 ! deallocate crtm_options_type
 subroutine destroy_options(optionsp) bind(c)

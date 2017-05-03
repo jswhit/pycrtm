@@ -64,6 +64,7 @@ cdef extern int init_options(long *n_Channels,int *check_input,
                 double *Aircraft_Pressure,int *Use_n_Streams,
                 long *n_Streams,int *Include_Scattering,
                 long *Channel,int *Use_Emissivity, void *optionsp);
+cdef extern int print_options(void *optionsp);
 cdef extern int destroy_options(void *optionsp);
 
 # header file with constants
@@ -402,6 +403,8 @@ cdef class Options:
                 &Aircraft_Pressure,&iUse_n_Streams,
                 &n_Streams,&iInclude_Scattering,
                 &Channel,&iUse_Emissivity, &self.ptr)
+    def show(self):
+        print_options(&self.ptr)
     def __dealloc__(self):
         destroy_options(&self.ptr)
 

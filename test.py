@@ -19,3 +19,5 @@ geometry.day = 21
 geometry.latitude = -3.1415
 geometry.show()
 print geometry
+options = pycrtm.Options(15)
+options.show()
