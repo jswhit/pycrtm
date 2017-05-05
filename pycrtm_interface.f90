@@ -6,7 +6,8 @@ use crtm_module, only: crtm_init, crtm_destroy, crtm_channelinfo_type, &
  success, strlen, crtm_channelinfo_inspect, crtm_geometry_inspect, &
  crtm_geometry_setvalue, crtm_geometry_type, crtm_geometry_destroy, &
  crtm_options_type,crtm_options_create,crtm_options_inspect, &
- crtm_options_destroy
+ crtm_options_destroy, crtm_surface_create, crtm_surface_inspect, &
+ crtm_surface_type,crtm_surface_destroy
  use ssu_input_define, only: ssu_input_setvalue,ssu_input_getvalue
  use zeeman_input_define, only: zeeman_input_getvalue,zeeman_input_setvalue
 implicit none 
@@ -651,6 +652,35 @@ subroutine destroy_options(optionsp) bind(c)
    call crtm_options_destroy(options)
    deallocate(options)
 end subroutine destroy_options
+
+! initialize crtm_surface_type
+subroutine init_surface(n_Channels,surfacep) bind(c)
+   type(c_ptr), intent(out) :: surfacep
+   integer(c_int), intent(in) :: n_Channels
+   type (crtm_surface_type), pointer :: surface
+   allocate(surface)
+   call crtm_surface_create(surface,n_Channels)
+   surfacep = c_loc(surface)
+end subroutine init_surface
+
+! print info in Surface type
+subroutine print_surface(surfacep) bind(c)
+  type(c_ptr), intent(in) :: surfacep
+  type (crtm_surface_type), pointer :: surface
+  call c_f_pointer(surfacep, surface)
+  call crtm_surface_inspect( surface )
+end subroutine print_surface
+
+! deallocate crtm_surface_type
+subroutine destroy_surface(surfacep) bind(c)
+   type(c_ptr), intent(in) :: surfacep
+   type (crtm_surface_type), pointer :: surface
+   call c_f_pointer(surfacep, surface)
+   call crtm_surface_destroy(surface)
+   if (allocated(surface%sensordata%sensor_channel)) deallocate(surface%sensordata%sensor_channel)
+   if (allocated(surface%sensordata%tb)) deallocate(surface%sensordata%tb)
+   deallocate(surface)
+end subroutine destroy_surface
 
 ! utility functions
 subroutine copy_string_ctof(stringc,stringf)

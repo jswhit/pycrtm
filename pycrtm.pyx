@@ -70,6 +70,9 @@ cdef extern int set_zeeman_input(void *optionsp, double *field_strength,
         double *cos_theta8, double *cos_phi8, double *doppler_shift);
 cdef extern int set_ssu_input(void *optionsp, double *time, double *cell_pressure,
         int *nchannel);
+cdef extern int init_surface(int *n_Channels, void *surfacep);
+cdef extern int print_surface(void *surfacep);
+cdef extern int destroy_surface(void *surfacep);
 
 # header file with constants
 cdef extern from 'pycrtm_interface.h':
@@ -404,10 +407,59 @@ cdef class Options:
             set_ssu_input(&self.ptr,NULL,&dcell_pressure,&ichannel)
     def show(self):
         print_options(&self.ptr)
-    def show(self):
-        print_options(&self.ptr)
     def __dealloc__(self):
         destroy_options(&self.ptr)
+
+# python version of crtm_surface_type fortran derived type
+# TYPE :: CRTM_Surface_type
+#   ! Allocation indicator
+#   LOGICAL :: Is_Allocated = .TRUE.  ! Placeholder for future expansion
+#   ! Dimension values
+#   ! ...None yet
+#   ! Gross type of surface determined by coverage
+#   REAL(fp) :: Land_Coverage  = ZERO
+#   REAL(fp) :: Water_Coverage = ZERO
+#   REAL(fp) :: Snow_Coverage  = ZERO
+#   REAL(fp) :: Ice_Coverage   = ZERO
+#   ! Land surface type data
+#   INTEGER  :: Land_Type             = DEFAULT_LAND_TYPE
+#   REAL(fp) :: Land_Temperature      = DEFAULT_LAND_TEMPERATURE
+#   REAL(fp) :: Soil_Moisture_Content = DEFAULT_SOIL_MOISTURE_CONTENT
+#   REAL(fp) :: Canopy_Water_Content  = DEFAULT_CANOPY_WATER_CONTENT
+#   REAL(fp) :: Vegetation_Fraction   = DEFAULT_VEGETATION_FRACTION
+#   REAL(fp) :: Soil_Temperature      = DEFAULT_SOIL_TEMPERATURE
+#   REAL(fp) :: LAI                   = DEFAULT_LAI
+#   INTEGER  :: Soil_Type             = DEFAULT_SOIL_TYPE
+#   INTEGER  :: Vegetation_Type       = DEFAULT_VEGETATION_TYPE
+#   ! Water type data
+#   INTEGER  :: Water_Type        = DEFAULT_WATER_TYPE
+#   REAL(fp) :: Water_Temperature = DEFAULT_WATER_TEMPERATURE
+#   REAL(fp) :: Wind_Speed        = DEFAULT_WIND_SPEED
+#   REAL(fp) :: Wind_Direction    = DEFAULT_WIND_DIRECTION
+#   REAL(fp) :: Salinity          = DEFAULT_SALINITY
+#   ! Snow surface type data
+#   INTEGER  :: Snow_Type        = DEFAULT_SNOW_TYPE
+#   REAL(fp) :: Snow_Temperature = DEFAULT_SNOW_TEMPERATURE
+#   REAL(fp) :: Snow_Depth       = DEFAULT_SNOW_DEPTH
+#   REAL(fp) :: Snow_Density     = DEFAULT_SNOW_DENSITY
+#   REAL(fp) :: Snow_Grain_Size  = DEFAULT_SNOW_GRAIN_SIZE
+#   ! Ice surface type data
+#   INTEGER  :: Ice_Type        = DEFAULT_ICE_TYPE
+#   REAL(fp) :: Ice_Temperature = DEFAULT_ICE_TEMPERATURE
+#   REAL(fp) :: Ice_Thickness   = DEFAULT_ICE_THICKNESS
+#   REAL(fp) :: Ice_Density     = DEFAULT_ICE_DENSITY
+#   REAL(fp) :: Ice_Roughness   = DEFAULT_ICE_ROUGHNESS
+#   ! SensorData containing channel brightness temperatures
+#   TYPE(CRTM_SensorData_type) :: SensorData
+# END TYPE CRTM_Surface_type
+cdef class Surface:
+    cdef void *ptr
+    def __init__(self,int n_Channels):
+        init_surface(&n_Channels, &self.ptr)
+    def show(self):
+        print_surface(&self.ptr)
+    def __dealloc__(self):
+        destroy_surface(&self.ptr)
 
 # TODO:
 # crtm_surface_type
