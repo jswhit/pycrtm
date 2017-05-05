@@ -671,6 +671,39 @@ subroutine print_surface(surfacep) bind(c)
   call crtm_surface_inspect( surface )
 end subroutine print_surface
 
+! set members of crtm_surface_type
+subroutine set_surface(surfacep,Land_Coverage, Water_Coverage, &
+            Snow_Coverage,Ice_Coverage,Land_Type, &
+            Land_Temperature,Soil_Moisture_Content, &
+            Canopy_Water_Content,Vegetation_Fraction, &
+            Soil_Temperature,LAI,Soil_Type, &
+            Vegetation_Type,Water_Type,Water_Temperature, &
+            Wind_Speed,Wind_Direction,Salinity, &
+            Snow_Type,Snow_Temperature,Snow_Depth, &
+            Snow_Density,Snow_Grain_Size,Ice_Type, &
+            Ice_Temperature,Ice_Thickness,Ice_Density, &
+            Ice_Roughness) bind(c)
+  integer(c_int), intent(in), optional :: Land_Type,Soil_Type,&
+  Snow_Type,Ice_Type,Vegetation_Type,Water_Type
+  real(c_double), intent(in), optional :: Land_Coverage, Water_Coverage,&
+              Snow_Coverage,Ice_Coverage, &
+              Land_Temperature,Soil_Moisture_Content, &
+              Canopy_Water_Content,Vegetation_Fraction, &
+              Soil_Temperature,LAI, &
+              Water_Temperature, &
+              Wind_Speed,Wind_Direction,Salinity, &
+              Snow_Temperature,Snow_Depth, &
+              Snow_Density,Snow_Grain_Size, &
+              Ice_Temperature,Ice_Thickness,Ice_Density, &
+              Ice_Roughness
+  type(c_ptr), intent(in) :: surfacep
+  type (crtm_surface_type), pointer :: surface
+  call c_f_pointer(surfacep, surface)
+  if (PRESENT(Land_Coverage)) surface%Land_Coverage=Land_Coverage
+  if (PRESENT(Land_Type)) surface%Land_Type=Land_Type
+  if (PRESENT(Ice_Type)) surface%Ice_Type=Ice_Type
+end subroutine set_surface
+
 ! deallocate crtm_surface_type
 subroutine destroy_surface(surfacep) bind(c)
    type(c_ptr), intent(in) :: surfacep

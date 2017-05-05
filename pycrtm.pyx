@@ -73,6 +73,17 @@ cdef extern int set_ssu_input(void *optionsp, double *time, double *cell_pressur
 cdef extern int init_surface(int *n_Channels, void *surfacep);
 cdef extern int print_surface(void *surfacep);
 cdef extern int destroy_surface(void *surfacep);
+cdef extern int set_surface(void *surfacep,double *Land_Coverage, double *Water_Coverage,
+            double *Snow_Coverage,double *Ice_Coverage,int *Land_Type,
+            double *Land_Temperature,double *Soil_Moisture_Content,
+            double *Canopy_Water_Content,double *Vegetation_Fraction,
+            double *Soil_Temperature,double *LAI,int *Soil_Type,
+            int *Vegetation_Type,int *Water_Type,double *Water_Temperature,
+            double *Wind_Speed,double *Wind_Direction,double *Salinity,
+            int *Snow_Type,double *Snow_Temperature,double *Snow_Depth,
+            double *Snow_Density,double *Snow_Grain_Size,int *Ice_Type,
+            double *Ice_Temperature,double* Ice_Thickness,double *Ice_Density,
+            double *Ice_Roughness);
 
 # header file with constants
 cdef extern from 'pycrtm_interface.h':
@@ -414,14 +425,10 @@ cdef class Options:
 # TYPE :: CRTM_Surface_type
 #   ! Allocation indicator
 #   LOGICAL :: Is_Allocated = .TRUE.  ! Placeholder for future expansion
-#   ! Dimension values
-#   ! ...None yet
-#   ! Gross type of surface determined by coverage
 #   REAL(fp) :: Land_Coverage  = ZERO
 #   REAL(fp) :: Water_Coverage = ZERO
 #   REAL(fp) :: Snow_Coverage  = ZERO
 #   REAL(fp) :: Ice_Coverage   = ZERO
-#   ! Land surface type data
 #   INTEGER  :: Land_Type             = DEFAULT_LAND_TYPE
 #   REAL(fp) :: Land_Temperature      = DEFAULT_LAND_TEMPERATURE
 #   REAL(fp) :: Soil_Moisture_Content = DEFAULT_SOIL_MOISTURE_CONTENT
@@ -431,19 +438,16 @@ cdef class Options:
 #   REAL(fp) :: LAI                   = DEFAULT_LAI
 #   INTEGER  :: Soil_Type             = DEFAULT_SOIL_TYPE
 #   INTEGER  :: Vegetation_Type       = DEFAULT_VEGETATION_TYPE
-#   ! Water type data
 #   INTEGER  :: Water_Type        = DEFAULT_WATER_TYPE
 #   REAL(fp) :: Water_Temperature = DEFAULT_WATER_TEMPERATURE
 #   REAL(fp) :: Wind_Speed        = DEFAULT_WIND_SPEED
 #   REAL(fp) :: Wind_Direction    = DEFAULT_WIND_DIRECTION
 #   REAL(fp) :: Salinity          = DEFAULT_SALINITY
-#   ! Snow surface type data
 #   INTEGER  :: Snow_Type        = DEFAULT_SNOW_TYPE
 #   REAL(fp) :: Snow_Temperature = DEFAULT_SNOW_TEMPERATURE
 #   REAL(fp) :: Snow_Depth       = DEFAULT_SNOW_DEPTH
 #   REAL(fp) :: Snow_Density     = DEFAULT_SNOW_DENSITY
 #   REAL(fp) :: Snow_Grain_Size  = DEFAULT_SNOW_GRAIN_SIZE
-#   ! Ice surface type data
 #   INTEGER  :: Ice_Type        = DEFAULT_ICE_TYPE
 #   REAL(fp) :: Ice_Temperature = DEFAULT_ICE_TEMPERATURE
 #   REAL(fp) :: Ice_Thickness   = DEFAULT_ICE_THICKNESS
@@ -456,6 +460,61 @@ cdef class Surface:
     cdef void *ptr
     def __init__(self,int n_Channels):
         init_surface(&n_Channels, &self.ptr)
+    def _set_value(self, Land_Coverage=None, Water_Coverage=None,
+            Snow_Coverage=None,Ice_Coverage=None,Land_Type=None,
+            Land_Temperature=None,Soil_Moisture_Content=None,
+            Canopy_Water_Content=None,Vegetation_Fraction=None,
+            Soil_Temperature=None,LAI=None,Soil_Type=None,
+            Vegetation_Type=None,Water_Type=None,Water_Temperature=None,
+            Wind_Speed=None,Wind_Direction=None,Salinity=None,
+            Snow_Type=None,Snow_Temperature=None,Snow_Depth=None,
+            Snow_Density=None,Snow_Grain_Size=None,Ice_Type=None,
+            Ice_Temperature=None,Ice_Thickness=None,Ice_Density=None,
+            Ice_Roughness=None):
+        cdef double dLandCoverage,dWaterCoverage,dSnowCoverage,dIceCoverage,\
+        dLandTemperature,dSoilMoistureConent,dCanopyWaterContent,\
+        dVegetationFraction,dSoilTemperature,dLAI,dWaterTemperature,\
+        dWindSpeed,dWindDirection,dSalinity,dSnowTemperature,\
+        dSnowDepth,dSnowDensity,dSnowGrainSize,dIceTemperature,\
+        dIceThickness,dIceDensity,dIceRoughness
+        cdef int iLandType,iSoilType,iVegetationType,iWaterType,iIceType,\
+        iSnowType
+        if Land_Coverage is not None:
+            dLandCoverage = Land_Coverage
+            set_surface(&self.ptr,&dLandCoverage,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Land_Type is not None:
+            iLandType = Land_Type
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,&iLandType,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Ice_Type is not None:
+            iIceType = Ice_Type
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,&iIceType,NULL,NULL,NULL,NULL)
+    property Land_Coverage:
+        """set Land_Coverage member of derived type"""
+        def __get__(self):
+            pass
+        def __set__(self,value):
+            self._set_value(Land_Coverage=value)
+    property Land_Type:
+        """set Land_Type member of derived type"""
+        def __get__(self):
+            pass
+        def __set__(self,value):
+            self._set_value(Land_Type=value)
+    property Ice_Type:
+        """set Ice_Type member of derived type"""
+        def __get__(self):
+            pass
+        def __set__(self,value):
+            self._set_value(Ice_Type=value)
     def show(self):
         print_surface(&self.ptr)
     def __dealloc__(self):

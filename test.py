@@ -24,4 +24,6 @@ options.set_zeeman(field_strength=-999,cos_phi8=3)
 options.set_ssu(time=-999)
 options.show()
 surface = pycrtm.Surface(15)
+surface.Land_Coverage=1
+surface.Land_Type=9
 surface.show()
