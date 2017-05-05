@@ -20,4 +20,6 @@ geometry.latitude = -3.1415
 geometry.show()
 print geometry
 options = pycrtm.Options(15)
+options.set_zeeman(field_strength=-999,cos_phi8=3)
+options.set_ssu(time=-999)
 options.show()

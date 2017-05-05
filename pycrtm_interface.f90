@@ -1,11 +1,14 @@
 module pycrtm_interface
 
 use iso_c_binding, only: c_char, c_int, c_double, c_null_char, &
- c_long, c_ptr, c_loc, c_f_pointer
+ c_float, c_long, c_ptr, c_loc, c_f_pointer
 use crtm_module, only: crtm_init, crtm_destroy, crtm_channelinfo_type, &
  success, strlen, crtm_channelinfo_inspect, crtm_geometry_inspect, &
  crtm_geometry_setvalue, crtm_geometry_type, crtm_geometry_destroy, &
- crtm_options_type,crtm_options_create,crtm_options_inspect
+ crtm_options_type,crtm_options_create,crtm_options_inspect, &
+ crtm_options_destroy
+ use ssu_input_define, only: ssu_input_setvalue,ssu_input_getvalue
+ use zeeman_input_define, only: zeeman_input_getvalue,zeeman_input_setvalue
 implicit none 
 
 contains
@@ -612,6 +615,26 @@ subroutine init_options(n_Channels,icheck_input, &
    optionsp = c_loc(options)
 end subroutine init_options
 
+! set zeeman_input_type values inside crtm_options_type.
+subroutine set_zeeman_input(optionsp,field_strength,cos_theta8,cos_phi8,doppler_shift) bind(c)
+  type(c_ptr), intent(in) :: optionsp
+  real(c_double), intent(in), optional :: field_strength,cos_theta8, cos_phi8, doppler_shift
+  type (crtm_options_type), pointer :: options
+  call c_f_pointer(optionsp, options)
+  call zeeman_input_setvalue(options%zeeman, field_strength, &
+          cos_theta8, cos_phi8, doppler_shift)
+end subroutine set_zeeman_input
+
+! set ssu_input_type values inside crtm_options_type.
+subroutine set_ssu_input(optionsp,time,cell_pressure,nchannel) bind(c)
+  type(c_ptr), intent(in) :: optionsp
+  real(c_double), intent(in), optional :: time, cell_pressure
+  integer(c_int), intent(in), optional :: nchannel
+  type (crtm_options_type), pointer :: options
+  call c_f_pointer(optionsp, options)
+  call ssu_input_setvalue(options%ssu, time, cell_pressure, nchannel)
+end subroutine set_ssu_input
+
 ! print info in Options type
 subroutine print_options(optionsp) bind(c)
   type(c_ptr), intent(in) :: optionsp
@@ -625,7 +648,7 @@ subroutine destroy_options(optionsp) bind(c)
    type(c_ptr), intent(in) :: optionsp
    type (crtm_options_type), pointer :: options
    call c_f_pointer(optionsp, options)
-   !call crtm_options_destroy(options)
+   call crtm_options_destroy(options)
    deallocate(options)
 end subroutine destroy_options
 

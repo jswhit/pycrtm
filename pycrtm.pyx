@@ -66,6 +66,10 @@ cdef extern int init_options(long *n_Channels,int *check_input,
                 long *Channel,int *Use_Emissivity, void *optionsp);
 cdef extern int print_options(void *optionsp);
 cdef extern int destroy_options(void *optionsp);
+cdef extern int set_zeeman_input(void *optionsp, double *field_strength,
+        double *cos_theta8, double *cos_phi8, double *doppler_shift);
+cdef extern int set_ssu_input(void *optionsp, double *time, double *cell_pressure,
+        int *nchannel);
 
 # header file with constants
 cdef extern from 'pycrtm_interface.h':
@@ -345,42 +349,6 @@ cdef class Geometry:
         destroy_geometry(&self.ptr)
 
 # python version of crtm_options_type fortran derived type
-# TYPE :: CRTM_Options_type
-#   ! Input checking on by default
-#   LOGICAL :: Check_Input = .TRUE.
-#   ! User defined MW water emissivity algorithm
-#   LOGICAL :: Use_Old_MWSSEM = .FALSE.
-#   ! Antenna correction application
-#   LOGICAL :: Use_Antenna_Correction = .FALSE.
-#   ! NLTE radiance correction is ON by default
-#   LOGICAL :: Apply_NLTE_Correction = .TRUE.
-#   ! RT Algorithm is set to ADA by default
-#   INTEGER(Long) :: RT_Algorithm_Id = RT_ADA
-#   ! Aircraft flight level pressure
-#   ! Value > 0 turns "on" the aircraft option
-#   REAL(Double) :: Aircraft_Pressure = -ONE
-#   ! User defined number of RT solver streams (streams up + streams down)
-#   LOGICAL       :: Use_n_Streams = .FALSE.
-#   INTEGER(Long) :: n_Streams = 0
-#   ! Scattering switch. Default is for
-#   ! Cloud/Aerosol scattering to be included.
-#   LOGICAL :: Include_Scattering = .TRUE.
-#   ! User defined emissivity/reflectivity
-#   ! ...Dimensions
-#   INTEGER(Long) :: n_Channels = 0  ! L dimension
-#   ! ...Index into channel-specific components
-#   INTEGER(Long) :: Channel = 0
-#   ! ...Emissivity optional arguments
-#   LOGICAL :: Use_Emissivity = .FALSE.
-#   REAL(Double), ALLOCATABLE :: Emissivity(:)  ! L
-#   ! ...Direct reflectivity optional arguments
-#   LOGICAL :: Use_Direct_Reflectivity = .FALSE.
-#   REAL(Double), ALLOCATABLE :: Direct_Reflectivity(:) ! L
-#   ! SSU instrument input
-#   TYPE(SSU_Input_type) :: SSU
-#   ! Zeeman-splitting input
-#   TYPE(Zeeman_Input_type) :: Zeeman
-# END TYPE CRTM_Options_type
 cdef class Options:
     cdef void *ptr
     def __init__(self,long n_Channels,check_input=True,Use_Old_MWSSEM=False,
@@ -403,6 +371,39 @@ cdef class Options:
                 &Aircraft_Pressure,&iUse_n_Streams,
                 &n_Streams,&iInclude_Scattering,
                 &Channel,&iUse_Emissivity, &self.ptr)
+    def set_zeeman(self, field_strength=None, cos_theta8=None, cos_phi8=None,
+                   doppler_shift=None):
+        cdef double dfield_strength
+        cdef double dcos_theta8
+        cdef double dcos_phi8
+        cdef double ddoppler_shift
+        if field_strength is not None:
+            dfield_strength = field_strength
+            set_zeeman_input(&self.ptr,&dfield_strength,NULL,NULL,NULL)
+        if cos_theta8 is not None:
+            dcos_theta8 = cos_theta8
+            set_zeeman_input(&self.ptr,NULL,&dfield_strength,NULL,NULL)
+        if cos_phi8 is not None:
+            dcos_phi8 = cos_phi8
+            set_zeeman_input(&self.ptr,NULL,NULL,&dcos_phi8,NULL)
+        if doppler_shift is not None:
+            ddoppler_shift = doppler_shift
+            set_zeeman_input(&self.ptr,NULL,NULL,NULL,&ddoppler_shift)
+    def set_ssu(self, time=None, cell_pressure=None, nchannel=None):
+        cdef double dcell_pressure, dtime
+        cdef int ichannel
+        if (cell_pressure is not None and nchannel is None) or\
+           (cell_pressure is None and nchannel is not None):
+            msg = 'must specify both cell_pressure and nchannel, or neither'
+            raise ValueError(msg)
+        if time is not None:
+            dtime = time
+            set_ssu_input(&self.ptr,&dtime,NULL,NULL)
+        if cell_pressure is not None and nchannel is not None:
+            dcell_pressure = cell_pressure; ichannel = nchannel
+            set_ssu_input(&self.ptr,NULL,&dcell_pressure,&ichannel)
+    def show(self):
+        print_options(&self.ptr)
     def show(self):
         print_options(&self.ptr)
     def __dealloc__(self):
@@ -412,9 +413,6 @@ cdef class Options:
 # crtm_surface_type
 # crtm_atmosphere_type
 # crtm_rtsolution_type
-# crtm_options_type
 # crtm_cloud_type ? (part of crtm_atmosphere_type)
 # crtm_aerosol_type ? (part of crtm_atmosphere_type)
 # crtm_SensorData_type ? (part of crtm_surface_type)
-# ssu_input_type? (part of crtm_options_type)
-# zeeman_input_type? (part of crtm_options_type)
