@@ -472,7 +472,7 @@ cdef class Surface:
             Ice_Temperature=None,Ice_Thickness=None,Ice_Density=None,
             Ice_Roughness=None):
         cdef double dLandCoverage,dWaterCoverage,dSnowCoverage,dIceCoverage,\
-        dLandTemperature,dSoilMoistureConent,dCanopyWaterContent,\
+        dLandTemperature,dSoilMoistureContent,dCanopyWaterContent,\
         dVegetationFraction,dSoilTemperature,dLAI,dWaterTemperature,\
         dWindSpeed,dWindDirection,dSalinity,dSnowTemperature,\
         dSnowDepth,dSnowDensity,dSnowGrainSize,dIceTemperature,\
@@ -483,6 +483,66 @@ cdef class Surface:
             dLandCoverage = Land_Coverage
             set_surface(&self.ptr,&dLandCoverage,
             NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Water_Coverage is not None:
+            dWaterCoverage = Water_Coverage
+            set_surface(&self.ptr,NULL,
+            &dWaterCoverage,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Snow_Coverage is not None:
+            dSnowCoverage = Snow_Coverage
+            set_surface(&self.ptr,NULL,
+            NULL,&dSnowCoverage,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Ice_Coverage is not None:
+            dIceCoverage = Ice_Coverage
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,&dIceCoverage,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Land_Temperature is not None:
+            dLandTemperature = Land_Temperature
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,&dLandTemperature,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Soil_Moisture_Content is not None:
+            dSoilMoistureContent = Soil_Moisture_Content
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,NULL,&dSoilMoistureContent,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Canopy_Moisture_Content is not None:
+            dCanopyMoistureContent = Canopy_Moisture_Content
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,NULL,NULL,&dCanopyMoistureContent,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Vegetation_Fraction is not None:
+            dVegetationFraction = Vegetation_Fraction
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,NULL,NULL,&dVegetationFraction,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Soil_Temperature is not None:
+            dSoilTemperature = Soil_Temperature
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,&dSoilTemperature,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if LAI is not None:
+            dLAI = LAI
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,&dLAI,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL)
+        if Soil_Type is not None:
+            dSoilType = Soil_Type
+            set_surface(&self.ptr,NULL,
+            NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,&dSoilType,NULL,NULL,
             NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,
             NULL,NULL,NULL,NULL,NULL,NULL,NULL)
         if Land_Type is not None:
